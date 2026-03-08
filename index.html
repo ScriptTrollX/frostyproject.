@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Frosty Arcade</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #4fd4ff 0, #020617 45%, #000 100%);
+      color: #e5f4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .frosty-shell {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow:
+        0 0 40px rgba(56, 189, 248, 0.35),
+        0 0 120px rgba(59, 130, 246, 0.25);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
+
+    .frosty-header {
+      position: relative;
+      padding: 24px 28px 18px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+    }
+
+    .dot.red { background: #f97373; }
+    .dot.yellow { background: #facc15; }
+    .dot.green { background: #4ade80; }
+
+    .frosty-title-block {
+      flex: 1;
+      text-align: center;
+    }
+
+    .frosty-logo {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #e0f2fe;
+      text-shadow:
+        0 0 14px rgba(56, 189, 248, 0.9),
+        0 0 34px rgba(37, 99, 235, 0.9);
+      filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.9));
+      animation: glowPulse 2.4s ease-in-out infinite;
+    }
+
+    .frosty-subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      opacity: 0.9;
+    }
+
+    .frosty-badge {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(96, 165, 250, 0.7);
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.35), rgba(15, 23, 42, 0.9));
+      color: #bfdbfe;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .frosty-main {
+      padding: 22px 24px 26px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      gap: 22px;
+    }
+
+    @media (max-width: 840px) {
+      .frosty-main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .frosty-header {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .frosty-title-block {
+        order: 3;
+      }
+    }
+
+    .hero-panel {
+      position: relative;
+      padding: 18px 18px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), rgba(15, 23, 42, 0.95));
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .welcome-title {
+      font-size: 26px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #e0f2fe;
+      text-align: center;
+      text-shadow:
+        0 0 12px rgba(56, 189, 248, 0.9),
+        0 0 30px rgba(37, 99, 235, 0.9);
+    }
+
+    .welcome-subtitle {
+      font-size: 13px;
+      text-align: center;
+      color: #bfdbfe;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .credits-box {
+      margin-top: 6px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #cbd5f5;
+      display: grid;
+      gap: 4px;
+    }
+
+    .credits-label {
+      font-weight: 600;
+      color: #bfdbfe;
+    }
+
+    .hero-text {
+      font-size: 13px;
+      color: #cbd5f5;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    .game-container {
+      margin-top: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 1));
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #cbd5f5;
+    }
+
+    .game-title {
+      font-weight: 600;
+    }
+
+    .game-fullscreen-btn {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5f4ff;
+      font-size: 11px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .game-fullscreen-btn:hover {
+      background: rgba(30, 64, 175, 0.9);
+      border-color: rgba(129, 140, 248, 0.9);
+    }
+
+    .game-area {
+      position: relative;
+      height: 260px;
+      border-radius: 12px;
+      background: radial-gradient(circle at center, #020617, #020617 60%, #000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .game-view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .game-view.active {
+      display: flex;
+    }
+
+    .clicker-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, #e0f2fe, #38bdf8);
+      box-shadow:
+        0 0 20px rgba(56, 189, 248, 0.9),
+        0 0 50px rgba(37, 99, 235, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 32px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.06s ease;
+    }
+
+    .clicker-circle:active {
+      transform: scale(0.95);
+    }
+
+    .clicker-label {
+      font-size: 13px;
+      color: #cbd5f5;
+    }
+
+    .clicker-stats {
+      font-size: 12px;
+      color: #a5b4fc;
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn-ghost {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.7);
+      color: #cbd5f5;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+      margin-top: 4px;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(30, 64, 175, 0.7);
+      border-color: rgba(129, 140, 248, 0.9);
+      color: #e0e7ff;
+    }
+
+    .games-panel {
+      padding: 18px 16px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.25), rgba(15, 23, 42, 0.96));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .games-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .games-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .game-card {
+      position: relative;
+      padding: 10px 10px 9px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: radial-gradient(circle at top, rgba(30, 64, 175, 0.7), rgba(15, 23, 42, 0.95));
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 22px rgba(59, 130, 246, 0.7);
+      border-color: rgba(129, 140, 248, 0.95);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.7), rgba(15, 23, 42, 0.98));
+    }
+
+    .game-card.active {
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.9);
+    }
+
+    .game-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e5f2ff;
+      margin-bottom: 2px;
+    }
+
+    .game-meta {
+      font-size: 11px;
+      color: #c4c6f5;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .game-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #bfdbfe;
+    }
+
+    .game-status {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #bbf7d0;
+    }
+
+    .frosty-footer {
+      padding: 10px 18px 14px;
+      border-top: 1px solid rgba(30, 64, 175, 0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #9ca3c9;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+      margin-right: 6px;
+    }
+
+    .status-text {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .shortcut-hint {
+      opacity: 0.8;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow:
+          0 0 10px rgba(56, 189, 248, 0.8),
+          0 0 26px rgba(37, 99, 235, 0.8);
+      }
+      50% {
+        text-shadow:
+          0 0 18px rgba(56, 189, 248, 1),
+          0 0 40px rgba(37, 99, 235, 1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frosty-shell">
+    <header class="frosty-header">
+      <div class="window-dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+
+      <div class="frosty-title-block">
+        <div class="frosty-logo">FROSTY</div>
+        <div class="frosty-subtitle">Welcome to Frosty</div>
+      </div>
+
+      <div class="frosty-badge">
+        Frosty Arcade • HTML Build
+      </div>
+    </header>
+
+    <main class="frosty-main">
+      <!-- LEFT: WELCOME + ACTIVE GAME -->
+      <section class="hero-panel" id="gameContainer">
+        <div>
+          <div class="welcome-title">WELCOME TO FROSTY</div>
+          <div class="welcome-subtitle">Your Game Hub</div>
+
+          <div class="credits-box">
+            <div><span class="credits-label">Created By:</span> Johnny &amp; Kirk</div>
+            <div><span class="credits-label">Website Type:</span> Game Website</div>
+            <div><span class="credits-label">Description:</span> A hub of custom Frosty games built for fun and instant play.</div>
+          </div>
+
+          <p class="hero-text">
+            Scroll through the games on the right and click one to start playing. Everything runs
+            right in your browser — no downloads, just Frosty.
+          </p>
+        </div>
+
+        <div class="game-container" id="activeGameWrapper">
+          <div class="game-header">
+            <div class="game-title" id="activeGameTitle">Frosty Clicker</div>
+            <button class="game-fullscreen-btn" onclick="goFullscreen('activeGameWrapper')">
+              Fullscreen
+            </button>
+          </div>
+          <div class="game-area">
+            <!-- Frosty Clicker -->
+            <div class="game-view active" id="frostyClicker">
+              <div class="clicker-circle" onclick="clickFrosty()">
+                ❄️
+              </div>
+              <div class="clicker-label">Click the snowflake to earn Frost Points</div>
+              <div class="clicker-stats">
+                <span>Score: <span id="frostyScore">0</span></span>
+                <span>Per click: <span id="frostyPerClick">1</span></span>
+              </div>
+              <button class="btn-ghost" onclick="upgradeFrosty()">
+                Upgrade (+1 per click) — Cost: <span id="frostyCost">20</span>
+              </button>
+            </div>
+
+            <!-- Planet Clicker -->
+            <div class="game-view" id="planetClicker">
+              <div class="clicker-circle" onclick="clickPlanet()" style="background: radial-gradient(circle at top, #fee2e2, #f97316);">
+                🪐
+              </div>
+              <div class="clicker-label">Click the planet to collect Stardust</div>
+              <div class="clicker-stats">
+                <span>Stardust: <span id="planetScore">0</span></span>
+                <span>Per click: <span id="planetPerClick">1</span></span>
+              </div>
+              <button class="btn-ghost" onclick="upgradePlanet()">
+                Upgrade (+1 per click) — Cost: <span id="planetCost">25</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: GAME LIST -->
+      <section class="games-panel">
+        <div class="games-header">
+          <div class="games-title">Games on Frosty</div>
+        </div>
+
+        <div class="games-grid">
+          <!-- GAME 1 -->
+          <div class="game-card active" onclick="setActiveGame('frostyClicker')" id="card-frostyClicker">
+            <div class="game-name">Frosty Clicker</div>
+            <div class="game-meta">
+              <span class="game-tag">Clicker</span>
+              <span class="game-status">Ready</span>
+            </div>
+          </div>
+
+          <!-- GAME 2 -->
+          <div class="game-card" onclick="setActiveGame('planetClicker')" id="card-planetClicker">
+            <div class="game-name">Planet Clicker</div>
+            <div class="game-meta">
+              <span class="game-tag">Clicker</span>
+              <span class="game-status">Ready</span>
+            </div>
+          </div>
+
+          <!-- EXTRA SLOT -->
+          <div class="game-card" onclick="alert('Future game slot — we can add another custom game here later.')">
+            <div class="game-name">Coming Soon</div>
+            <div class="game-meta">
+              <span class="game-tag">New</span>
+              <span class="game-status">Locked</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="frosty-footer">
+      <div class="status-text">
+        <span class="status-dot"></span>
+        Frosty status: Online • Custom HTML games active
+      </div>
+      <div class="shortcut-hint">
+        Tip: Host this as <strong>index.html</strong> on GitHub Pages.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Active game switching
+    function setActiveGame(id) {
+      const views = document.querySelectorAll('.game-view');
+      views.forEach(v => v.classList.remove('active'));
+      const active = document.getElementById(id);
+      if (active) active.classList.add('active');
+
+      const title = document.getElementById('activeGameTitle');
+      if (id === 'frostyClicker') title.textContent = 'Frosty Clicker';
+      if (id === 'planetClicker') title.textContent = 'Planet Clicker';
+
+      document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active'));
+      const card = document.getElementById('card-' + id);
+      if (card) card.classList.add('active');
+    }
+
+    // Fullscreen
+    function goFullscreen(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    }
+
+    // Frosty Clicker logic
+    let frostyScore = 0;
+    let frostyPerClick = 1;
+    let frostyCost = 20;
+
+    function updateFrostyUI() {
+      document.getElementById('frostyScore').textContent = frostyScore;
+      document.getElementById('frostyPerClick').textContent = frostyPerClick;
+      document.getElementById('frostyCost').textContent = frostyCost;
+    }
+
+    function clickFrosty() {
+      frostyScore += frostyPerClick;
+      updateFrostyUI();
+    }
+
+    function upgradeFrosty() {
+      if (frostyScore >= frostyCost) {
+        frostyScore -= frostyCost;
+        frostyPerClick += 1;
+        frostyCost = Math.floor(frostyCost * 1.8);
+        updateFrostyUI();
+      }
+    }
+
+    // Planet Clicker logic
+    let planetScore = 0;
+    let planetPerClick = 1;
+    let planetCost = 25;
+
+    function updatePlanetUI() {
+      document.getElementById('planetScore').textContent = planetScore;
+      document.getElementById('planetPerClick').textContent = planetPerClick;
+      document.getElementById('planetCost').textContent = planetCost;
+    }
+
+    function clickPlanet() {
+      planetScore += planetPerClick;
+      updatePlanetUI();
+    }
+
+    function upgradePlanet() {
+      if (planetScore >= planetCost) {
+        planetScore -= planetCost;
+        planetPerClick += 1;
+        planetCost = Math.floor(planetCost * 1.9);
+        updatePlanetUI();
+      }
+    }
+
+    // Init UI
+    updateFrostyUI();
+    updatePlanetUI();
+  </script>
+</body>
+</html>
